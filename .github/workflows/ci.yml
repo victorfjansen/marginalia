@@ -2,6 +2,9 @@
 # For now it only builds the software. Add one job for SAST, one for the
 # tests and one for DAST.
 name: CI
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 on:
   push:
@@ -20,3 +23,23 @@ jobs:
       - uses: actions/checkout@v6
       - name: Build the software and the unit tests
         run: make
+
+  valgrind_scanner:
+    name: Valgrind
+    needs: [build]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - name: Run Valgrind
+        run: |
+          make valgrind
+
+  ASan_UBSan_scanner:
+    name: ASan/UBSan
+    needs: [build]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - name: Run ASAN/UBSan
+        run: |
+          make sanitizers
