@@ -29,6 +29,10 @@ jobs:
     needs: [build]
     runs-on: ubuntu-24.04
     steps:
+      - name: Setup
+        run: |
+          sudo apt-get update && sudo apt-get install -y valgrind
+
       - uses: actions/checkout@v6
       - name: Run Valgrind
         run: |
